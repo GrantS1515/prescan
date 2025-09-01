@@ -15,12 +15,15 @@ describe("state manipulation tests", () => {
     it("Non-Quote Letters", () => {
         pipe(in1, Ps.sepNewLines, (s) => [s, E.right(out1)], EqTo.checkEither(Ps.errEq, EqTo.basicEq), EqTo.toBool, b => expect(b).to.equal(true));
     });
-    it("Letters within quote", () => {
-        pipe(in2, Ps.sepNewLines, console.log
-        // (s) => [s, E.right(out2)],
-        // EqTo.checkEither( Ps.errEq, EqTo.basicEq ),
-        // EqTo.toBool, 
-        // b => expect(b).to.equal(true),
-        );
-    });
+    //	it("Letters within quote", () => {
+    //		pipe(
+    //			in2,
+    //			Ps.sepNewLines,
+    //			console.log
+    //			// (s) => [s, E.right(out2)],
+    //			// EqTo.checkEither( Ps.errEq, EqTo.basicEq ),
+    //			// EqTo.toBool, 
+    //			// b => expect(b).to.equal(true),
+    //		)
+    //	})
 });

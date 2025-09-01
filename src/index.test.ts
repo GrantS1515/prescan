@@ -33,15 +33,15 @@ describe("state manipulation tests", () => {
 		)
 	})
 
-	it("Letters within quote", () => {
-		pipe(
-			in2,
-			Ps.sepNewLines,
-			console.log
-			// (s) => [s, E.right(out2)],
-			// EqTo.checkEither( Ps.errEq, EqTo.basicEq ),
-			// EqTo.toBool, 
-			// b => expect(b).to.equal(true),
-		)
-	})
+//	it("Letters within quote", () => {
+//		pipe(
+//			in2,
+//			Ps.sepNewLines,
+//			console.log
+//			// (s) => [s, E.right(out2)],
+//			// EqTo.checkEither( Ps.errEq, EqTo.basicEq ),
+//			// EqTo.toBool, 
+//			// b => expect(b).to.equal(true),
+//		)
+//	})
 })

@@ -10,7 +10,7 @@ import * as SE from "fp-ts/lib/Separated.js"
 import * as P from "fp-ts/lib/Predicate.js"
 import { produce } from "immer"
 import * as EqTo from "eq-to/dist/index.js"
-import * as Sm from "SplitMachine/dist/index.js"
+import * as Sm from "splitmachine/dist/index.js"
 import * as Sp from "SplitString/dist/index.js"
 
 export type Err = {
@@ -29,48 +29,23 @@ export const errEq:
 	)
 
 const stopFn: Sm.StateFn = 
-	sps =>
-	pipe(
-		sps,
-		Sp.isRightEmpty,
-		E.map(sp => ({ name: "State", id: "stop", split: sp }))
-	)
+    Sm.newStopFn("stop")
 
-const alphanum: Sm.StateFn = 
-	sps =>
-	pipe(
-		sps,
-		Sp.leadRight(1),
-		E.map((s) => s.match(/^[a-z0-9]+$/i)),
-		E.map(s => s !== null),
-		E.chain(b => B.match(
-			() => E.left(Sm.newErr("Not Letter")),
-			() => Sp.shiftLeft(1)(sps),
-		)(b) ),
-		E.map(sp => ({ name: "State", id: "alphanum", split: sp }))
-	)
-
-const alphanum: Sm.StateFn = 
-	sps =>
-	pipe(
-		sps,
-		Sp.leadRight(1),
-		E.map((s) => s.match(/^[a-z0-9]+$/i)),
-		E.map(s => s !== null),
-		E.chain(b => B.match(
-			() => E.left(Sm.newErr("Not Letter")),
-			() => Sp.shiftLeft(1)(sps),
-		)(b) ),
-		E.map(sp => ({ name: "State", id: "alphanum", split: sp }))
-	)
-
+const extLetFn: Sm.StateFn = 
+    Sm.newStateShiftFn(1)
+    (s => pipe( 
+        s.match(/^[a-z0-9]+$/i),
+        str => str !== null,
+    ))
+    ("Not a letter")
+    ("extLet")
 
 const sepNewLinesMachine: Sm.Machine = {
 	name: "Machine",
 	stopId: "stop",
 	transitions: new Map([
-		["start", [alphanum, stopFn] ],
-		["alphanum", [alphanum, stopFn] ],
+		["start", [extLetFn, stopFn] ],
+		["extLet", [extLetFn, stopFn] ],
 	]),
 }
 
