@@ -1,0 +1,21 @@
+
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "ES2022",
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "declaration": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "allowSyntheticDefaultImports": true,
+        "noUncheckedIndexedAccess": true,
+        "moduleResolution": "node"
+    },
+    "exclude": [
+        "./node_modules",
+        "./dist"
+    ]
+}
