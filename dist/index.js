@@ -6,13 +6,29 @@ import * as Sm from "splitmachine/dist/index.js";
 import * as Sp from "SplitString/dist/index.js";
 export const errEq = e => pipe(e, EqTo.checkField("name")(EqTo.basicEq), E.chain(EqTo.checkField("msg")(EqTo.basicEq)));
 const stopFn = Sm.newStopFn("stop");
-const extLetFn = Sm.newStateShiftFn(1)(s => pipe(s.match(/^[a-z0-9]+$/i), str => str !== null))("Not a letter")("extLet");
+const letFnFn = {
+    name: "StateFnFn",
+    strLen: 1,
+    testFn: (s => pipe(s.match(/^[a-z0-9]+$/i), str => str !== null)),
+};
+const quoteFnFn = {
+    name: "StateFnFn",
+    strLen: 1,
+    testFn: (s => pipe(s === "\"")),
+};
+const extLetFn = Sm.newStateShiftFn("extLet")("Not a letter")(letFnFn);
+const intLetFn = Sm.newStateShiftFn("intLet")("Not a letter")(letFnFn);
+const startQuoteFn = Sm.newStateShiftFn("startQuote")("Not a quote")(quoteFnFn);
+const endQuoteFn = Sm.newStateShiftFn("endQuote")("Not a quote")(quoteFnFn);
 const sepNewLinesMachine = {
     name: "Machine",
     stopId: "stop",
     transitions: new Map([
-        ["start", [extLetFn, stopFn]],
-        ["extLet", [extLetFn, stopFn]],
+        ["start", [extLetFn, startQuoteFn, stopFn]],
+        ["extLet", [extLetFn, startQuoteFn, stopFn]],
+        ["startQuote", [intLetFn, endQuoteFn]],
+        ["intLet", [intLetFn, endQuoteFn]],
+        ["endQuote", [extLetFn, stopFn]]
     ]),
 };
 const defaultState = {

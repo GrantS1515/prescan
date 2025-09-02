@@ -31,21 +31,44 @@ export const errEq:
 const stopFn: Sm.StateFn = 
     Sm.newStopFn("stop")
 
-const extLetFn: Sm.StateFn = 
-    Sm.newStateShiftFn(1)
-    (s => pipe( 
-        s.match(/^[a-z0-9]+$/i),
-        str => str !== null,
-    ))
-    ("Not a letter")
-    ("extLet")
+const letFnFn: Sm.StateFnFn = {
+    name: "StateFnFn",
+    strLen: 1,
+	testFn: (s => pipe( 
+            s.match(/^[a-z0-9]+$/i),
+            str => str !== null,
+        )),
+}
+
+const quoteFnFn: Sm.StateFnFn = {
+    name: "StateFnFn",
+    strLen: 1,
+	testFn: (s => pipe( 
+             s === "\""
+        )),
+}
+
+const extLetFn: Sm.StateFn =
+    Sm.newStateShiftFn("extLet")("Not a letter")(letFnFn)
+
+const intLetFn: Sm.StateFn =
+    Sm.newStateShiftFn("intLet")("Not a letter")(letFnFn)
+
+const startQuoteFn: Sm.StateFn =
+    Sm.newStateShiftFn("startQuote")("Not a quote")(quoteFnFn)
+
+const endQuoteFn: Sm.StateFn =
+    Sm.newStateShiftFn("endQuote")("Not a quote")(quoteFnFn)
 
 const sepNewLinesMachine: Sm.Machine = {
 	name: "Machine",
 	stopId: "stop",
 	transitions: new Map([
-		["start", [extLetFn, stopFn] ],
-		["extLet", [extLetFn, stopFn] ],
+		["start", [extLetFn, startQuoteFn, stopFn] ],
+		["extLet", [extLetFn, startQuoteFn, stopFn] ],
+        ["startQuote", [intLetFn, endQuoteFn ] ],
+        ["intLet", [intLetFn, endQuoteFn ]],
+        ["endQuote", [ extLetFn, stopFn ]]
 	]),
 }
 

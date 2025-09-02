@@ -15,6 +15,9 @@ const out1 = "abc"
 const in2 = "\"abc\""
 const out2 = "\"abc\""
 
+const in3 = "abc\"def\"ghi"
+const out3 = "abc\"def\"ghi"
+
 // TODO: empty, start with quote, start with newline
 // TODO: make the letter fn have a regex input
 
@@ -33,15 +36,24 @@ describe("state manipulation tests", () => {
 		)
 	})
 
-//	it("Letters within quote", () => {
-//		pipe(
-//			in2,
-//			Ps.sepNewLines,
-//			console.log
-//			// (s) => [s, E.right(out2)],
-//			// EqTo.checkEither( Ps.errEq, EqTo.basicEq ),
-//			// EqTo.toBool, 
-//			// b => expect(b).to.equal(true),
-//		)
-//	})
+	it("Letters within quote", () => {
+		pipe(
+			in2,
+			Ps.sepNewLines,
+			(s) => [s, E.right(out2)],
+			EqTo.checkEither( Ps.errEq, EqTo.basicEq ),
+			EqTo.toBool, 
+			b => expect(b).to.equal(true),
+		)
+	})
+	it("letters before and after quote", () => {
+		pipe(
+			in3,
+			Ps.sepNewLines,
+			(s) => [s, E.right(out3)],
+			EqTo.checkEither( Ps.errEq, EqTo.basicEq ),
+			EqTo.toBool, 
+			b => expect(b).to.equal(true),
+		)
+	})
 })
