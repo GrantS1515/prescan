@@ -48,6 +48,14 @@ const quoteFnFn: Sm.StateFnFn = {
         )),
 }
 
+const extNewLineFnFn: Sm.StateFnFn = {
+    name: "StateFnFn",
+    strLen: 1,
+	testFn: (s => pipe( 
+             s === "\n"
+        )),
+}
+
 const extLetFn: Sm.StateFn =
     Sm.newStateShiftFn("extLet")("Not a letter")(letFnFn)
 
@@ -60,15 +68,19 @@ const startQuoteFn: Sm.StateFn =
 const endQuoteFn: Sm.StateFn =
     Sm.newStateShiftFn("endQuote")("Not a quote")(quoteFnFn)
 
+const extNewLineFn: Sm.StateFn =
+    Sm.newStateShiftFn("extNewLine")("Not a newline")(extNewLineFnFn)
+
 const sepNewLinesMachine: Sm.Machine = {
 	name: "Machine",
 	stopId: "stop",
 	transitions: new Map([
 		["start", [extLetFn, startQuoteFn, stopFn] ],
-		["extLet", [extLetFn, startQuoteFn, stopFn] ],
+		["extLet", [extLetFn, startQuoteFn, extNewLineFn, stopFn] ],
         ["startQuote", [intLetFn, endQuoteFn ] ],
         ["intLet", [intLetFn, endQuoteFn ]],
-        ["endQuote", [ extLetFn, stopFn ]]
+        ["endQuote", [ extLetFn, stopFn ]],
+        ["extNewLine", [extNewLineFn, extLetFn, startQuoteFn, stopFn]]
 	]),
 }
 

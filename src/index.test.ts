@@ -9,6 +9,9 @@ import * as SE from "fp-ts/lib/Separated.js"
 import * as EqTo from "eq-to/dist/index.js"
 import { produce } from "immer"
 
+const in0 = ""
+const out0 = ""
+
 const in1 = "abc"
 const out1 = "abc"
 
@@ -18,6 +21,9 @@ const out2 = "\"abc\""
 const in3 = "abc\"def\"ghi"
 const out3 = "abc\"def\"ghi"
 
+const in4 = "abc\ndef"
+const out4 = "abc\ndef"
+
 // TODO: empty, start with quote, start with newline
 // TODO: make the letter fn have a regex input
 
@@ -25,6 +31,17 @@ const out3 = "abc\"def\"ghi"
 // const out1 = "\"Hello\"\n\"World\""
 
 describe("state manipulation tests", () => {
+	it("empty string", () => {
+		pipe(
+			in0,
+			Ps.sepNewLines,
+			(s) => [s, E.right(out0)],
+			EqTo.checkEither( Ps.errEq, EqTo.basicEq ),
+			EqTo.toBool, 
+			b => expect(b).to.equal(true),
+		)
+	})
+
 	it("Non-Quote Letters", () => {
 		pipe(
 			in1,
@@ -56,4 +73,17 @@ describe("state manipulation tests", () => {
 			b => expect(b).to.equal(true),
 		)
 	})
+
+	it("newline with letters before and after ", () => {
+		pipe(
+			in4,
+			Ps.sepNewLines,
+			(s) => [s, E.right(out4)],
+			EqTo.checkEither( Ps.errEq, EqTo.basicEq ),
+			EqTo.toBool, 
+			b => expect(b).to.equal(true),
+		)
+	})
+
+    // internal newline fn that splits the quotation
 })
