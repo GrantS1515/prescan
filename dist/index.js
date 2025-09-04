@@ -7,25 +7,32 @@ import * as Sp from "SplitString/dist/index.js";
 export const errEq = e => pipe(e, EqTo.checkField("name")(EqTo.basicEq), E.chain(EqTo.checkField("msg")(EqTo.basicEq)));
 const stopFn = Sm.newStopFn("stop");
 const letFnFn = {
-    name: "StateFnFn",
+    name: "ShiftFnArgs",
     strLen: 1,
     testFn: (s => pipe(s.match(/^[a-z0-9]+$/i), str => str !== null)),
 };
 const quoteFnFn = {
-    name: "StateFnFn",
+    name: "ShiftFnArgs",
     strLen: 1,
     testFn: (s => pipe(s === "\"")),
 };
 const extNewLineFnFn = {
-    name: "StateFnFn",
+    name: "ShiftFnArgs",
     strLen: 1,
     testFn: (s => pipe(s === "\n")),
 };
-const extLetFn = Sm.newStateShiftFn("extLet")("Not a letter")(letFnFn);
-const intLetFn = Sm.newStateShiftFn("intLet")("Not a letter")(letFnFn);
-const startQuoteFn = Sm.newStateShiftFn("startQuote")("Not a quote")(quoteFnFn);
-const endQuoteFn = Sm.newStateShiftFn("endQuote")("Not a quote")(quoteFnFn);
-const extNewLineFn = Sm.newStateShiftFn("extNewLine")("Not a newline")(extNewLineFnFn);
+const extLetFn = Sm.newStateShiftFn("extLet")(letFnFn);
+const intLetFn = Sm.newStateShiftFn("intLet")(letFnFn);
+const startQuoteFn = Sm.newStateShiftFn("startQuote")(quoteFnFn);
+const endQuoteFn = Sm.newStateShiftFn("endQuote")(quoteFnFn);
+const extNewLineFn = Sm.newStateShiftFn("extNewLine")(extNewLineFnFn);
+const intNewLineFnArgs = {
+    name: "GenFnArgs",
+    strLen: 1,
+    testFn: (s) => s === "\n",
+    splitFn: (sps) => pipe(sps, Sp.insertLeft("\""), Sp.shiftLeft(1), E.map(Sp.insertLeft("\"")))
+};
+const intNewLineFn = Sm.newStateGenFn("intNewLine")(intNewLineFnArgs);
 const sepNewLinesMachine = {
     name: "Machine",
     stopId: "stop",
@@ -33,9 +40,10 @@ const sepNewLinesMachine = {
         ["start", [extLetFn, startQuoteFn, stopFn]],
         ["extLet", [extLetFn, startQuoteFn, extNewLineFn, stopFn]],
         ["startQuote", [intLetFn, endQuoteFn]],
-        ["intLet", [intLetFn, endQuoteFn]],
+        ["intLet", [intLetFn, endQuoteFn, intNewLineFn]],
         ["endQuote", [extLetFn, stopFn]],
-        ["extNewLine", [extNewLineFn, extLetFn, startQuoteFn, stopFn]]
+        ["extNewLine", [extNewLineFn, extLetFn, startQuoteFn, stopFn]],
+        ["intNewLine", [endQuoteFn, intLetFn, stopFn]],
     ]),
 };
 const defaultState = {

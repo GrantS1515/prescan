@@ -31,8 +31,8 @@ export const errEq:
 const stopFn: Sm.StateFn = 
     Sm.newStopFn("stop")
 
-const letFnFn: Sm.StateFnFn = {
-    name: "StateFnFn",
+const letFnFn: Sm.ShiftFnArgs = {
+    name: "ShiftFnArgs",
     strLen: 1,
 	testFn: (s => pipe( 
             s.match(/^[a-z0-9]+$/i),
@@ -40,16 +40,16 @@ const letFnFn: Sm.StateFnFn = {
         )),
 }
 
-const quoteFnFn: Sm.StateFnFn = {
-    name: "StateFnFn",
+const quoteFnFn: Sm.ShiftFnArgs = {
+    name: "ShiftFnArgs",
     strLen: 1,
 	testFn: (s => pipe( 
              s === "\""
         )),
 }
 
-const extNewLineFnFn: Sm.StateFnFn = {
-    name: "StateFnFn",
+const extNewLineFnFn: Sm.ShiftFnArgs = {
+    name: "ShiftFnArgs",
     strLen: 1,
 	testFn: (s => pipe( 
              s === "\n"
@@ -57,19 +57,34 @@ const extNewLineFnFn: Sm.StateFnFn = {
 }
 
 const extLetFn: Sm.StateFn =
-    Sm.newStateShiftFn("extLet")("Not a letter")(letFnFn)
+    Sm.newStateShiftFn("extLet")(letFnFn)
 
 const intLetFn: Sm.StateFn =
-    Sm.newStateShiftFn("intLet")("Not a letter")(letFnFn)
+    Sm.newStateShiftFn("intLet")(letFnFn)
 
 const startQuoteFn: Sm.StateFn =
-    Sm.newStateShiftFn("startQuote")("Not a quote")(quoteFnFn)
+    Sm.newStateShiftFn("startQuote")(quoteFnFn)
 
 const endQuoteFn: Sm.StateFn =
-    Sm.newStateShiftFn("endQuote")("Not a quote")(quoteFnFn)
+    Sm.newStateShiftFn("endQuote")(quoteFnFn)
 
 const extNewLineFn: Sm.StateFn =
-    Sm.newStateShiftFn("extNewLine")("Not a newline")(extNewLineFnFn)
+    Sm.newStateShiftFn("extNewLine")(extNewLineFnFn)
+
+const intNewLineFnArgs: Sm.GenFnArgs = {
+    name: "GenFnArgs",
+    strLen: 1,
+    testFn: (s) => s === "\n",
+    splitFn: (sps) => pipe(
+        sps,
+        Sp.insertLeft("\""),
+        Sp.shiftLeft(1),
+        E.map(Sp.insertLeft("\""))
+    )
+}
+
+const intNewLineFn: Sm.StateFn =
+    Sm.newStateGenFn("intNewLine")(intNewLineFnArgs)
 
 const sepNewLinesMachine: Sm.Machine = {
 	name: "Machine",
@@ -78,9 +93,10 @@ const sepNewLinesMachine: Sm.Machine = {
 		["start", [extLetFn, startQuoteFn, stopFn] ],
 		["extLet", [extLetFn, startQuoteFn, extNewLineFn, stopFn] ],
         ["startQuote", [intLetFn, endQuoteFn ] ],
-        ["intLet", [intLetFn, endQuoteFn ]],
+        ["intLet", [intLetFn, endQuoteFn, intNewLineFn ]],
         ["endQuote", [ extLetFn, stopFn ]],
-        ["extNewLine", [extNewLineFn, extLetFn, startQuoteFn, stopFn]]
+        ["extNewLine", [extNewLineFn, extLetFn, startQuoteFn, stopFn]],
+        ["intNewLine", [endQuoteFn, intLetFn, stopFn]],
 	]),
 }
 
