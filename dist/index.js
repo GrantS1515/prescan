@@ -55,5 +55,4 @@ const newStartState = s => produce(defaultState, draft => {
     draft.id = "start",
         draft.split = Sp.newSplitString("")(s);
 });
-export const sepNewLines = s => pipe(s, newStartState, Sm.interp(sepNewLinesMachine), E.map(sps => sps.sep.left) // TODO clean and add an empty check
-);
+export const sepNewLines = s => pipe(s, newStartState, Sm.interp(sepNewLinesMachine), E.map(Sp.getLeft));

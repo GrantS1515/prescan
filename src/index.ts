@@ -122,5 +122,5 @@ export const sepNewLines:
 		s,
 		newStartState,
 		Sm.interp(sepNewLinesMachine),
-		E.map(sps => sps.sep.left) // TODO clean and add an empty check
+		E.map(Sp.getLeft) 
 	)
