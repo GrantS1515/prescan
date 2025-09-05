@@ -1,10 +1,10 @@
 import { pipe } from 'fp-ts/lib/function.js';
 import * as Ps from "./index.js";
-import { expect } from "chai";
 import * as E from "fp-ts/lib/Either.js";
 import * as EqTo from "eq-to/dist/index.js";
+import { exEq } from "fptsutils/dist/expect.js";
 describe("state manipulation tests", () => {
-    const compareFn = (inStr) => (outStr) => pipe(inStr, Ps.sepNewLines, (s) => [s, E.right(outStr)], EqTo.checkEither(Ps.errEq, EqTo.basicEq), EqTo.toBool, b => expect(b).to.equal(true));
+    const compareFn = (inStr) => (outStr) => pipe(inStr, Ps.sepNewLines, (s) => [s, E.right(outStr)], EqTo.checkEither(Ps.errEq, EqTo.basicEq), EqTo.toBool, exEq(true));
     const printFn = (inStr) => pipe(inStr, Ps.sepNewLines, console.log);
     it("empty string", () => {
         const inStr = "";
@@ -31,6 +31,16 @@ describe("state manipulation tests", () => {
         const outStr = "abc\ndef";
         compareFn(inStr)(outStr);
     });
+    it("single start newline", () => {
+        const inStr = "\n";
+        const outStr = "\n";
+        compareFn(inStr)(outStr);
+    });
+    // multiple newline start
+    // multiple newline extLet
+    // multiple newline intLet
+    // end newline
+    // any character not just letter or number
     it("can seperate a quote with newline into two quotes", () => {
         const inStr = "\"abc\ndef\"";
         const outStr = "\"abc\"\n\"def\"";

@@ -33,17 +33,28 @@ const intNewLineFnArgs = {
     splitFn: (sps) => pipe(sps, Sp.insertLeft("\""), Sp.shiftLeft(1), E.map(Sp.insertLeft("\"")))
 };
 const intNewLineFn = Sm.newStateGenFn("intNewLine")(intNewLineFnArgs);
+const extStates = [
+    extLetFn,
+    extNewLineFn,
+    startQuoteFn,
+    stopFn,
+];
+const intState = [
+    intLetFn,
+    intNewLineFn,
+    endQuoteFn,
+];
 const sepNewLinesMachine = {
     name: "Machine",
     stopId: "stop",
     transitions: new Map([
-        ["start", [extLetFn, startQuoteFn, stopFn]],
-        ["extLet", [extLetFn, startQuoteFn, extNewLineFn, stopFn]],
-        ["startQuote", [intLetFn, endQuoteFn]],
-        ["intLet", [intLetFn, endQuoteFn, intNewLineFn]],
-        ["endQuote", [extLetFn, stopFn]],
-        ["extNewLine", [extNewLineFn, extLetFn, startQuoteFn, stopFn]],
-        ["intNewLine", [endQuoteFn, intLetFn, stopFn]],
+        ["start", extStates],
+        ["extLet", extStates],
+        ["startQuote", intState],
+        ["intLet", intState],
+        ["endQuote", extStates],
+        ["extNewLine", extStates],
+        ["intNewLine", intState],
     ]),
 };
 const defaultState = {

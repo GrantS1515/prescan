@@ -8,6 +8,7 @@ import * as A from "fp-ts/lib/Array.js"
 import * as SE from "fp-ts/lib/Separated.js"
 import * as EqTo from "eq-to/dist/index.js"
 import { produce } from "immer"
+import { exEq } from "fptsutils/dist/expect.js"
 
 describe("state manipulation tests", () => {
 
@@ -20,7 +21,7 @@ describe("state manipulation tests", () => {
 			(s) => [s, E.right(outStr)],
 			EqTo.checkEither( Ps.errEq, EqTo.basicEq ),
 			EqTo.toBool, 
-			b => expect(b).to.equal(true),
+            exEq(true)
 		)
 
 
@@ -61,6 +62,18 @@ describe("state manipulation tests", () => {
         const outStr = "abc\ndef"
         compareFn(inStr)(outStr)
 	})
+
+	it("single start newline", () => {
+        const inStr = "\n"
+        const outStr = "\n"
+        compareFn(inStr)(outStr)
+	})
+    
+    // multiple newline start
+    // multiple newline extLet
+    // multiple newline intLet
+    // end newline
+    // any character not just letter or number
 
     it("can seperate a quote with newline into two quotes", () => {
         const inStr = "\"abc\ndef\""
